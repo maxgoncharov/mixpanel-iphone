@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/mixpanel/mixpanel-iphone.svg?branch=yolo-travis-ci)](https://travis-ci.org/mixpanel/mixpanel-iphone)
 
+Russian dialogs and descriptions in surveys.
+
 Mixpanel supports `Cocoapods` for easy installation.
 To Install, see our **[full documentation »](https://mixpanel.com/help/reference/ios)**
 

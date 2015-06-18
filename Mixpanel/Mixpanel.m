@@ -1387,6 +1387,22 @@ static void MixpanelReachabilityCallback(SCNetworkReachabilityRef target, SCNetw
 {
     if (survey) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSUInteger questionCount = survey.questions.count;
+            
+            NSString *bodyText = [NSString stringWithFormat: @"Ответьте на %lu вопрос", questionCount];
+            
+            if (questionCount > 10 && questionCount < 20) {
+                bodyText = [bodyText stringByAppendingString: @"ов"];
+            } else if (questionCount % 10 >= 2 && questionCount % 10 <= 4) {
+                bodyText = [bodyText stringByAppendingString: @"a"];
+            } else if (questionCount % 10 != 1) {
+                bodyText = [bodyText stringByAppendingString: @"ов"];
+            }
+            
+            bodyText = [bodyText stringByReplacingOccurrencesOfString:@" 1 "
+                                                           withString:@" один "];
+            
             if (self.currentlyShowingSurvey) {
                 MixpanelError(@"%@ already showing survey: %@", self, self.currentlyShowingSurvey);
             } else if (self.currentlyShowingNotification) {
@@ -1396,33 +1412,33 @@ static void MixpanelReachabilityCallback(SCNetworkReachabilityRef target, SCNetw
                 if (showAlert) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
                     if ([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending) {
-                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"We'd love your feedback!" message:@"Mind taking a quick survey?" preferredStyle:UIAlertControllerStyleAlert];
-                        [alert addAction:[UIAlertAction actionWithTitle:@"No, Thanks" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Нам нужно ваше мнение, чтобы стать лучше!" message:bodyText preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Нет, извините" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
                             if (self.currentlyShowingSurvey) {
                                 [self markSurvey:self.currentlyShowingSurvey shown:NO withAnswerCount:0];
                                 self.currentlyShowingSurvey = nil;
                             }
                         }]];
-                        [alert addAction:[UIAlertAction actionWithTitle:@"Sure" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Да, конечно" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                             if (self.currentlyShowingSurvey) {
                                 [self presentSurveyWithRootViewController:self.currentlyShowingSurvey];
                             }
                         }]];
                         [[Mixpanel topPresentedViewController] presentViewController:alert animated:YES completion:nil];
                     } else {
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"We'd love your feedback!"
-                                                                        message:@"Mind taking a quick survey?"
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Нам нужно ваше мнение, чтобы стать лучше!"
+                                                                        message:bodyText
                                                                        delegate:self
-                                                              cancelButtonTitle:@"No, Thanks"
-                                                              otherButtonTitles:@"Sure", nil];
+                                                              cancelButtonTitle:@"Нет, извините"
+                                                              otherButtonTitles:@"Да, конечно", nil];
                         [alert show];
                     }
 #else
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"We'd love your feedback!"
-                                                                    message:@"Mind taking a quick survey?"
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Нам нужно ваше мнение, чтобы стать лучше!"
+                                                                    message:bodyText
                                                                    delegate:self
-                                                          cancelButtonTitle:@"No, Thanks"
-                                                          otherButtonTitles:@"Sure", nil];
+                                                          cancelButtonTitle:@"Нет, извините"
+                                                          otherButtonTitles:@"Да, конечно", nil];
                     [alert show];
 #endif
                 } else {
@@ -1437,7 +1453,7 @@ static void MixpanelReachabilityCallback(SCNetworkReachabilityRef target, SCNetw
 
 - (void)showSurveyWithObject:(MPSurvey *)survey
 {
-    [self showSurveyWithObject:survey withAlert:NO];
+    [self showSurveyWithObject:survey withAlert:YES];
 }
 
 - (void)showSurvey
