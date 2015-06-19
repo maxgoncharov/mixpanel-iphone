@@ -561,6 +561,8 @@
 
 - (NSString *)libVersion;
 
+- (void) enforceClearCache;
+
 
 #if !defined(MIXPANEL_APP_EXTENSION)
 #pragma mark - Mixpanel Surveys

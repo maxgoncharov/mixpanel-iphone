@@ -1168,6 +1168,10 @@ static void MixpanelReachabilityCallback(SCNetworkReachabilityRef target, SCNetw
 
 #pragma mark - Decide
 
+- (void) enforceClearCache {
+    self.decideResponseCached = NO;
+}
+
 + (UIViewController *)topPresentedViewController
 {
     UIViewController *controller = [UIApplication sharedApplication].keyWindow.rootViewController;
